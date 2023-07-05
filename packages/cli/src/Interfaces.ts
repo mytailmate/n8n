@@ -22,7 +22,7 @@ import type {
 	IExecutionsSummary,
 	FeatureFlags,
 	IUserSettings,
-	WebhookHttpMethod,
+	IHttpRequestMethods,
 } from 'n8n-workflow';
 
 import type { ActiveWorkflowRunner } from '@/ActiveWorkflowRunner';
@@ -302,10 +302,14 @@ export interface IExternalHooksClass {
 	run(hookName: string, hookParameters?: any[]): Promise<void>;
 }
 
+export type WebhookRequest = Request<{ path: string }> & {
+	method: IHttpRequestMethods | 'OPTIONS';
+};
+
 export interface IWebhookManager {
-	getWebhookMethods?: (path: string) => Promise<string[]>;
+	getWebhookMethods: (path: string) => Promise<IHttpRequestMethods[]>;
 	executeWebhook(
-		httpMethod: WebhookHttpMethod,
+		httpMethod: IHttpRequestMethods,
 		path: string,
 		req: Request,
 		res: Response,
@@ -601,7 +605,6 @@ export interface IPushDataConsoleMessage {
 
 export interface IResponseCallbackData {
 	data?: IDataObject | IDataObject[];
-	headers?: object;
 	noWebhookResponse?: boolean;
 	responseCode?: number;
 }

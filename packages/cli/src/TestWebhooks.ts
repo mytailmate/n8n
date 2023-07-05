@@ -1,13 +1,10 @@
-/* eslint-disable consistent-return */
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-/* eslint-disable no-param-reassign */
 import type express from 'express';
 import { Service } from 'typedi';
 
 import type {
 	IWebhookData,
 	IWorkflowExecuteAdditionalData,
-	WebhookHttpMethod,
+	IHttpRequestMethods,
 	Workflow,
 	WorkflowActivateMode,
 	WorkflowExecuteMode,
@@ -45,7 +42,7 @@ export class TestWebhooks implements IWebhookManager {
 	 * automatically remove the test-webhook.
 	 */
 	async executeWebhook(
-		httpMethod: WebhookHttpMethod,
+		httpMethod: IHttpRequestMethods,
 		path: string,
 		request: express.Request,
 		response: express.Response,
@@ -158,7 +155,7 @@ export class TestWebhooks implements IWebhookManager {
 	/**
 	 * Gets all request methods associated with a single test webhook
 	 */
-	async getWebhookMethods(path: string): Promise<string[]> {
+	async getWebhookMethods(path: string): Promise<IHttpRequestMethods[]> {
 		const webhookMethods = this.activeWebhooks.getWebhookMethods(path);
 		if (!webhookMethods.length) {
 			// The requested webhook is not registered

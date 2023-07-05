@@ -36,7 +36,7 @@ import type {
 	IWebhookData,
 	IWorkflowExecuteAdditionalData,
 	NodeParameterValue,
-	WebhookHttpMethod,
+	IHttpRequestMethods,
 	FieldType,
 	INodePropertyOptions,
 	ResourceMapperValue,
@@ -973,7 +973,7 @@ export function getNodeWebhooks(
 		}
 
 		returnData.push({
-			httpMethod: httpMethod.toString() as WebhookHttpMethod,
+			httpMethod: httpMethod.toString() as IHttpRequestMethods,
 			node: node.name,
 			path,
 			webhookDescription,
