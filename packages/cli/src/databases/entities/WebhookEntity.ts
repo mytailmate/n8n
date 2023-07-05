@@ -10,7 +10,7 @@ export class WebhookEntity {
 	@PrimaryColumn()
 	webhookPath: string;
 
-	@PrimaryColumn()
+	@PrimaryColumn({ type: 'text' })
 	method: IHttpRequestMethods;
 
 	@Column()

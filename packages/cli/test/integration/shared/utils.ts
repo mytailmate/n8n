@@ -1,9 +1,7 @@
 import { Container } from 'typedi';
 import { randomBytes } from 'crypto';
 import { existsSync } from 'fs';
-
 import cookieParser from 'cookie-parser';
-import bodyParser from 'body-parser';
 import { CronJob } from 'cron';
 import express from 'express';
 import set from 'lodash/set';
@@ -64,7 +62,7 @@ import {
 	PasswordResetController,
 	UsersController,
 } from '@/controllers';
-import { setupAuthMiddlewares } from '@/middlewares';
+import { rawBody, jsonParser, setupAuthMiddlewares } from '@/middlewares';
 import * as testDb from '../shared/testDb';
 
 import { v4 as uuid } from 'uuid';
@@ -120,8 +118,8 @@ export async function initTestServer({
 	mockInstance(InternalHooks);
 	mockInstance(PostHogClient);
 
-	testServer.app.use(bodyParser.json());
-	testServer.app.use(bodyParser.urlencoded({ extended: true }));
+	testServer.app.use(rawBody);
+	testServer.app.use(jsonParser);
 	testServer.app.use(cookieParser());
 
 	config.set('userManagement.jwtSecret', 'My JWT secret');
