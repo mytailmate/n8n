@@ -33,7 +33,7 @@ import {
 	SOURCE_CONTROL_PUSH_MODAL_KEY,
 	SOURCE_CONTROL_PULL_MODAL_KEY,
 } from '@/constants';
-import type { BANNERS } from '@/constants';
+import { BANNERS } from '@/constants';
 import type {
 	CurlToJSONResponse,
 	IFakeDoorLocation,
@@ -55,6 +55,7 @@ import { i18n as locale } from '@/plugins/i18n';
 import type { Modals, NewCredentialsModal } from '@/Interface';
 import { useTelemetryStore } from '@/stores/telemetry.store';
 import { getStyleTokenValue } from '@/utils';
+import { dismissBannerPermanently, dismissV1BannerPermanently } from '@/api/ui';
 
 export const useUIStore = defineStore(STORES.UI, {
 	state: (): UIState => ({
@@ -347,6 +348,12 @@ export const useUIStore = defineStore(STORES.UI, {
 		},
 	},
 	actions: {
+		setBanners(banners: UIState['banners']): void {
+			this.banners = {
+				...this.banners,
+				...banners,
+			};
+		},
 		setMode(name: keyof Modals, mode: string): void {
 			this.modals[name] = {
 				...this.modals[name],
@@ -544,15 +551,29 @@ export const useUIStore = defineStore(STORES.UI, {
 				location.href = this.upgradeLinkUrl(source, utm_campaign);
 			}
 		},
-		dismissBanner(name: BANNERS, type: 'temporary' | 'permanent' = 'temporary'): void {
+		async dismissBanner(
+			name: BANNERS,
+			type: 'temporary' | 'permanent' = 'temporary',
+		): Promise<void> {
+			if (type === 'permanent') {
+				await dismissBannerPermanently(useRootStore().getRestApiContext, { bannerName: name });
+				this.banners[name].dismissed = true;
+				this.banners[name].type = 'permanent';
+				return;
+			}
 			this.banners[name].dismissed = true;
-			this.banners[name].type = type;
+			this.banners[name].type = 'temporary';
+			this.updateBannersHeight();
 		},
 		showBanner(name: BANNERS): void {
 			this.banners[name].dismissed = false;
+			this.updateBannersHeight();
 		},
 		updateBannersHeight(): void {
-			this.bannersHeight = document.getElementById('banners')?.clientHeight ?? 0;
+			// Wait a bit for the DOM to update before getting the height
+			setTimeout(() => {
+				this.bannersHeight = document.getElementById('banners')?.clientHeight ?? 0;
+			}, 0);
 		},
 	},
 });

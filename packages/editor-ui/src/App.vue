@@ -58,7 +58,6 @@ import {
 	useCloudPlanStore,
 	useSourceControlStore,
 	useUsageStore,
-	useCanvasStore,
 } from '@/stores';
 import { useHistoryHelper } from '@/composables/useHistoryHelper';
 import { newVersions } from '@/mixins/newVersions';
@@ -94,13 +93,12 @@ export default defineComponent({
 			useSourceControlStore,
 			useCloudPlanStore,
 			useUsageStore,
-			useCanvasStore,
 		),
 		defaultLocale(): string {
 			return this.rootStore.defaultLocale;
 		},
 		isDemoMode(): boolean {
-			return this.canvasStore.isDemo;
+			return this.$route.name === VIEWS.DEMO;
 		},
 	},
 	data() {
@@ -158,7 +156,7 @@ export default defineComponent({
 		},
 		authenticate() {
 			// redirect to setup page. user should be redirected to this only once
-			if (this.settingsStore.isUserManagementEnabled && this.settingsStore.showSetupPage) {
+			if (this.settingsStore.showSetupPage) {
 				if (this.$route.name === VIEWS.SETUP) {
 					return;
 				}
@@ -228,16 +226,17 @@ export default defineComponent({
 				} catch {}
 			}, CLOUD_TRIAL_CHECK_INTERVAL);
 		},
-		initBanners() {
-			// Update banner container height when a banner is shown or dismissed
-			this.uiStore.$onAction(({ name, after }) => {
-				if (['dismissBanner', 'showBanner'].includes(name)) {
-					after(() => {
-						this.$nextTick(() => {
-							this.uiStore.updateBannersHeight();
-						});
-					});
+		async initBanners(): Promise<void> {
+			if (this.cloudPlanStore.userIsTrialing) {
+				await this.uiStore.dismissBanner(BANNERS.V1, 'temporary');
+				if (this.cloudPlanStore.trialExpired) {
+					this.uiStore.showBanner(BANNERS.TRIAL_OVER);
+				} else {
+					this.uiStore.showBanner(BANNERS.TRIAL);
 				}
+			}
+			this.$nextTick(() => {
+				this.uiStore.updateBannersHeight();
 			});
 		},
 	},
@@ -248,25 +247,15 @@ export default defineComponent({
 		this.authenticate();
 		this.redirectIfNecessary();
 		void this.checkForNewVersions();
-		void this.checkForCloudPlanData().then(() => {
-			if (this.cloudPlanStore.userIsTrialing) {
-				if (this.cloudPlanStore.trialExpired) {
-					this.uiStore.showBanner(BANNERS.TRIAL_OVER);
-				} else {
-					this.uiStore.showBanner(BANNERS.TRIAL);
-				}
-			}
-		})
+		void this.checkForCloudPlanData().then(async () => {
+			await this.initBanners();
+		});
 
-		if (
-			this.sourceControlStore.isEnterpriseSourceControlEnabled &&
-			this.usersStore.isInstanceOwner
-		) {
+		if (this.sourceControlStore.isEnterpriseSourceControlEnabled) {
 			await this.sourceControlStore.getPreferences();
 		}
 
 		this.loading = false;
-		this.initBanners();
 
 		this.trackPage();
 		void this.externalHooks.run('app.mount');
@@ -276,7 +265,7 @@ export default defineComponent({
 		}
 	},
 	watch: {
-		$route(route) {
+		$route() {
 			this.authenticate();
 			this.redirectIfNecessary();
 
@@ -322,7 +311,7 @@ export default defineComponent({
 
 .header {
 	grid-area: header;
-	z-index: 999;
+	z-index: 99;
 }
 
 .sidebar {
