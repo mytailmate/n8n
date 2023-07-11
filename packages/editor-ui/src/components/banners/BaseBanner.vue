@@ -18,13 +18,19 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits(['close']);
 
-function onCloseClick() {
-	uiStore.dismissBanner(props.name);
+async function onCloseClick() {
+	await uiStore.dismissBanner(props.name);
 	emit('close');
 }
 </script>
 <template>
-	<n8n-callout :theme="props.theme" :icon="props.customIcon" :roundCorners="false" :slim="true">
+	<n8n-callout
+		:theme="props.theme"
+		:icon="props.customIcon"
+		:roundCorners="false"
+		:slim="true"
+		:data-test-id="`banners-${props.name}`"
+	>
 		<div :class="$style.mainContent">
 			<slot name="mainContent" />
 		</div>
@@ -37,6 +43,7 @@ function onCloseClick() {
 					icon="times"
 					title="Dismiss"
 					class="clickable"
+					:data-test-id="`banners-${props.name}-close`"
 					@click="onCloseClick"
 				/>
 			</div>
