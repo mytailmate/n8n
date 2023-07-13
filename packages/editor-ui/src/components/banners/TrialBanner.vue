@@ -4,33 +4,32 @@ import { i18n as locale } from '@/plugins/i18n';
 import { BANNERS } from '@/constants';
 import { useCloudPlanStore } from '@/stores/cloudPlan.store';
 import { computed } from 'vue';
+import { useUIStore } from '@/stores';
 
 const trialDaysLeft = computed(() => {
 	const { trialDaysLeft } = useCloudPlanStore();
-	return trialDaysLeft;
+	return -1 * trialDaysLeft;
+});
+
+const messageText = computed(() => {
+	return locale.baseText('banners.trial.message', {
+		adjustToNumber: trialDaysLeft.value,
+		interpolate: { count: String(trialDaysLeft.value) },
+	});
 });
 
 function onUpdatePlanClick() {
-	window.location.href = '/account/change-plan';
-}
-
-function messageText() {
-	if (trialDaysLeft.value === 1) {
-		return locale.baseText('banners.trial.oneDayLeft');
-	}
-	return locale.baseText('banners.trial.message', {
-		interpolate: { daysLeft: String(-1 * trialDaysLeft.value) },
-	});
+	useUIStore().goToUpgrade('canvas-nav', 'upgrade-canvas-nav', 'redirect');
 }
 </script>
 
 <template>
-	<base-banner :name="BANNERS.TRIAL">
+	<base-banner :name="BANNERS.TRIAL" theme="custom">
 		<template #mainContent>
-			<span>{{ messageText() }}</span>
+			<span>{{ messageText }}</span>
 		</template>
 		<template #trailingContent>
-			<n8n-button type="success" @click="onUpdatePlanClick" icon="gem">{{
+			<n8n-button type="success" @click="onUpdatePlanClick" icon="gem" size="small">{{
 				locale.baseText('generic.upgradeNow')
 			}}</n8n-button>
 		</template>

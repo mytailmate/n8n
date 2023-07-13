@@ -27,8 +27,8 @@ async function onCloseClick() {
 	<n8n-callout
 		:theme="props.theme"
 		:icon="props.customIcon"
+		iconSize="medium"
 		:roundCorners="false"
-		:slim="true"
 		:data-test-id="`banners-${props.name}`"
 	>
 		<div :class="$style.mainContent">
@@ -43,7 +43,7 @@ async function onCloseClick() {
 					icon="times"
 					title="Dismiss"
 					class="clickable"
-					:data-test-id="`banners-${props.name}-close`"
+					:data-test-id="`banner-${props.name}-close`"
 					@click="onCloseClick"
 				/>
 			</div>

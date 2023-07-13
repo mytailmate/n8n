@@ -35,6 +35,7 @@ import {
 } from '@/constants';
 import type { BANNERS } from '@/constants';
 import type {
+	CloudUpdateLinkSourceType,
 	CurlToJSONResponse,
 	IFakeDoorLocation,
 	IMenuItem,
@@ -42,6 +43,7 @@ import type {
 	IOnboardingCallPrompt,
 	IUser,
 	UIState,
+	UTMCampaign,
 	XYPosition,
 } from '@/Interface';
 import { defineStore } from 'pinia';
@@ -192,7 +194,7 @@ export const useUIStore = defineStore(STORES.UI, {
 			TRIAL: { dismissed: true },
 			TRIAL_OVER: { dismissed: true },
 		},
-		bannersHeight: document.getElementById('banners')?.clientHeight ?? 0,
+		bannersHeight: 0,
 	}),
 	getters: {
 		contextBasedTranslationKeys() {
@@ -534,7 +536,11 @@ export const useUIStore = defineStore(STORES.UI, {
 			const rootStore = useRootStore();
 			return getCurlToJson(rootStore.getRestApiContext, curlCommand);
 		},
-		goToUpgrade(source: string, utm_campaign: string, mode: 'open' | 'redirect' = 'open'): void {
+		goToUpgrade(
+			source: CloudUpdateLinkSourceType,
+			utm_campaign: UTMCampaign,
+			mode: 'open' | 'redirect' = 'open',
+		): void {
 			const { usageLeft, trialDaysLeft, userIsTrialing } = useCloudPlanStore();
 			const { executionsLeft, workflowsLeft } = usageLeft;
 			useTelemetryStore().track('User clicked upgrade CTA', {
@@ -566,17 +572,12 @@ export const useUIStore = defineStore(STORES.UI, {
 			}
 			this.banners[name].dismissed = true;
 			this.banners[name].type = 'temporary';
-			this.updateBannersHeight();
 		},
 		showBanner(name: BANNERS): void {
 			this.banners[name].dismissed = false;
-			this.updateBannersHeight();
 		},
-		updateBannersHeight(): void {
-			// Wait a bit for the DOM to update before getting the height
-			setTimeout(() => {
-				this.bannersHeight = document.getElementById('banners')?.clientHeight ?? 0;
-			}, 0);
+		updateBannersHeight(newHeight: number): void {
+			this.bannersHeight = newHeight;
 		},
 	},
 });

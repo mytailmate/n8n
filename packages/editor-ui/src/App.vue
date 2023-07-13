@@ -236,9 +236,6 @@ export default defineComponent({
 					this.uiStore.showBanner(BANNERS.TRIAL);
 				}
 			}
-			this.$nextTick(() => {
-				this.uiStore.updateBannersHeight();
-			});
 		},
 		async postAuthenticate() {
 			if (this.postAuthenticateDone) {
@@ -263,9 +260,8 @@ export default defineComponent({
 		this.authenticate();
 		this.redirectIfNecessary();
 		void this.checkForNewVersions();
-		this.checkForCloudPlanData().then(async () => {
-			await this.initBanners();
-		});
+		await this.checkForCloudPlanData();
+		await this.initBanners();
 
 		if (this.sourceControlStore.isEnterpriseSourceControlEnabled) {
 			await this.sourceControlStore.getPreferences();
