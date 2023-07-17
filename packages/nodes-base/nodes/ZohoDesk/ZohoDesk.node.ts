@@ -45,6 +45,8 @@ import type {
 import {
 	accountFields,
 	accountOperations,
+	ticketFields,
+	ticketOperations,
 	contactFields,
 	contactOperations,
 	dealFields,
@@ -65,23 +67,23 @@ import {
 	vendorOperations,
 } from './descriptions';
 
-export class ZohoCrm implements INodeType {
+export class ZohoDesk implements INodeType {
 	description: INodeTypeDescription = {
-		displayName: 'Zoho CRM',
-		name: 'zohoCrm',
+		displayName: 'Zoho Desk',
+		name: 'zohoDesk',
 		icon: 'file:zoho.svg',
 		group: ['transform'],
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
 		version: 1,
-		description: 'Consume Zoho CRM API',
+		description: 'Consume Zoho Desk API',
 		defaults: {
-			name: 'Zoho CRM',
+			name: 'Zoho Desk',
 		},
 		inputs: ['main'],
 		outputs: ['main'],
 		credentials: [
 			{
-				name: 'zohoOAuth2Api',
+				name: 'zohoDeskOAuth2Api',
 				required: true,
 			},
 		],
@@ -92,6 +94,10 @@ export class ZohoCrm implements INodeType {
 				type: 'options',
 				noDataExpression: true,
 				options: [
+					{
+						name: 'Ticket',
+						value: 'ticket',
+					},
 					{
 						name: 'Account',
 						value: 'account',
@@ -135,6 +141,8 @@ export class ZohoCrm implements INodeType {
 				],
 				default: 'account',
 			},
+			...ticketOperations,
+			...ticketFields,
 			...accountOperations,
 			...accountFields,
 			...contactOperations,
@@ -171,6 +179,15 @@ export class ZohoCrm implements INodeType {
 					'/accounts',
 				)) as LoadedAccounts;
 				return toLoadOptions(accounts, 'Account_Name');
+			},
+
+			async getTickets(this: ILoadOptionsFunctions) {
+				const contacts = (await zohoApiRequestAllItems.call(
+					this,
+					'GET',
+					'/tickets',
+				)) as LoadedContacts;
+				return toLoadOptions(contacts, 'Full_Name');
 			},
 
 			async getContacts(this: ILoadOptionsFunctions) {
@@ -490,7 +507,113 @@ export class ZohoCrm implements INodeType {
 						const phone = this.getNodeParameter('phone', i);
 
 						const endpoint = `/contacts/search`;
-						responseData = await zohoApiRequest.call(this, 'GET', endpoint, {}, {phone: `${phone}`});
+						responseData = await zohoApiRequest.call(this, 'GET', endpoint, {}, {phone: `${phone}`}, "https://desk.zoho.in");
+						responseData = responseData.data;
+					} else if (operation === 'getAll') {
+						// ----------------------------------------
+						//             contact: getAll
+						// ----------------------------------------
+
+						const qs: IDataObject = {};
+						const options = this.getNodeParameter('options', i) as GetAllFilterOptions;
+
+						addGetAllFilterOptions(qs, options);
+
+						responseData = await handleListing.call(this, 'GET', '/contacts', {}, qs);
+					} else if (operation === 'update') {
+						// ----------------------------------------
+						//             contact: update
+						// ----------------------------------------
+
+						const body: IDataObject = {};
+						const updateFields = this.getNodeParameter('updateFields', i);
+
+						if (Object.keys(updateFields).length) {
+							Object.assign(body, adjustContactPayload(updateFields));
+						} else {
+							throwOnEmptyUpdate.call(this, resource);
+						}
+
+						const contactId = this.getNodeParameter('contactId', i);
+
+						const endpoint = `/contacts/${contactId}`;
+						responseData = await zohoApiRequest.call(this, 'PUT', endpoint, body);
+						responseData = responseData.data[0].details;
+					} else if (operation === 'upsert') {
+						// ----------------------------------------
+						//             contact: upsert
+						// ----------------------------------------
+
+						const body: IDataObject = {
+							Last_Name: this.getNodeParameter('lastName', i),
+						};
+
+						const additionalFields = this.getNodeParameter('additionalFields', i);
+
+						if (Object.keys(additionalFields).length) {
+							Object.assign(body, adjustContactPayload(additionalFields));
+						}
+
+						responseData = await zohoApiRequest.call(this, 'POST', '/contacts/upsert', body);
+						responseData = responseData.data[0].details;
+					}
+				}  else if (resource === 'ticket') {
+					// **********************************************************************
+					//                                contact
+					// **********************************************************************
+
+					// https://www.zoho.com/crm/developer/docs/api/v2/contacts-response.html
+					// https://help.zoho.com/portal/en/kb/crm/customize-crm-account/customizing-fields/articles/standard-modules-fields#Contacts
+
+					if (operation === 'create') {
+						// ----------------------------------------
+						//             contact: create
+						// ----------------------------------------
+
+						const body: IDataObject = {
+							subject: this.getNodeParameter('subject', i),
+							departmentId: this.getNodeParameter('departmentId', i),
+							contactId: this.getNodeParameter('contactId', i),
+							phone: this.getNodeParameter('phone', i),
+						};
+
+						const additionalFields = this.getNodeParameter('additionalFields', i);
+
+						if (Object.keys(additionalFields).length) {
+							Object.assign(body, adjustContactPayload(additionalFields));
+						}
+
+						responseData = await zohoApiRequest.call(this, 'POST', '/tickets', body, {}, "https://desk.zoho.in");
+						responseData = responseData.data[0].details;
+					} else if (operation === 'delete') {
+						// ----------------------------------------
+						//             contact: delete
+						// ----------------------------------------
+
+						const contactId = this.getNodeParameter('contactId', i);
+
+						const endpoint = `/contacts/${contactId}`;
+						responseData = await zohoApiRequest.call(this, 'DELETE', endpoint);
+						responseData = responseData.data[0].details;
+					} else if (operation === 'get') {
+						// ----------------------------------------
+						//               contact: get
+						// ----------------------------------------
+
+						const contactId = this.getNodeParameter('contactId', i);
+
+						const endpoint = `/contacts/${contactId}`;
+						responseData = await zohoApiRequest.call(this, 'GET', endpoint);
+						responseData = responseData.data;
+					} else if (operation === 'search') {
+						// ----------------------------------------
+						//               contact: get
+						// ----------------------------------------
+
+						const phone = this.getNodeParameter('phone', i);
+
+						const endpoint = `/tickets/search`;
+						responseData = await zohoApiRequest.call(this, 'GET', endpoint, {}, {phone: `${phone}`}, "https://desk.zoho.in");
 						responseData = responseData.data;
 					} else if (operation === 'getAll') {
 						// ----------------------------------------

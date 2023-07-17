@@ -8,7 +8,7 @@ import {
 	otherAddress,
 } from './SharedFields';
 
-export const contactOperations: INodeProperties[] = [
+export const ticketOperations: INodeProperties[] = [
 	{
 		displayName: 'Operation',
 		name: 'operation',
@@ -16,70 +16,135 @@ export const contactOperations: INodeProperties[] = [
 		noDataExpression: true,
 		displayOptions: {
 			show: {
-				resource: ['contact'],
+				resource: ['ticket'],
 			},
 		},
 		options: [
 			{
 				name: 'Create',
 				value: 'create',
-				description: 'Create a contact',
-				action: 'Create a contact',
+				description: 'Create a ticket',
+				action: 'Create a ticket',
 			},
 			{
 				name: 'Create or Update',
 				value: 'upsert',
 				description: 'Create a new record, or update the current one if it already exists (upsert)',
-				action: 'Create or Update a contact',
+				action: 'Create or Update a ticket',
 			},
 			{
 				name: 'Delete',
 				value: 'delete',
-				description: 'Delete a contact',
-				action: 'Delete a contact',
+				description: 'Delete a ticket',
+				action: 'Delete a ticket',
 			},
 			{
 				name: 'Get',
 				value: 'get',
-				description: 'Get a contact',
-				action: 'Get a contact',
+				description: 'Get a ticket',
+				action: 'Get a ticket',
 			},
 			{
 				name: 'Search',
 				value: 'search',
-				description: 'Search a contact',
-				action: 'Search a contact',
+				description: 'Search a ticket',
+				action: 'Search a ticket',
 			},
 			{
 				name: 'Get Many',
 				value: 'getAll',
-				description: 'Get many contacts',
-				action: 'Get many contacts',
+				description: 'Get many tickets',
+				action: 'Get many tickets',
 			},
 			{
 				name: 'Update',
 				value: 'update',
-				description: 'Update a contact',
-				action: 'Update a contact',
+				description: 'Update a ticket',
+				action: 'Update a ticket',
 			},
 		],
 		default: 'create',
 	},
 ];
 
-export const contactFields: INodeProperties[] = [
+export const ticketFields: INodeProperties[] = [
 	// ----------------------------------------
 	//             contact: create
 	// ----------------------------------------
 	{
-		displayName: 'Last Name',
-		name: 'lastName',
+		displayName: 'Subject',
+		name: 'subject',
 		type: 'string',
 		required: true,
 		default: '',
 		displayOptions: {
 			show: {
-				resource: ['contact'],
+				resource: ['ticket'],
+				operation: ['create'],
+			},
+		},
+	},
+	{
+		displayName: 'Department Id',
+		name: 'departmentId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['ticket'],
+				operation: ['create'],
+			},
+		},
+	},
+	{
+		displayName: 'Contact Id',
+		name: 'contactId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['ticket'],
+				operation: ['create'],
+			},
+		},
+	},
+	{
+		displayName: 'Phone',
+		name: 'phone',
+		type: 'string',
+		required: false,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['ticket'],
+				operation: ['create'],
+			},
+		},
+	},
+	{
+		displayName: 'Description',
+		name: 'description',
+		type: 'string',
+		required: false,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['ticket'],
+				operation: ['create'],
+			},
+		},
+	},
+	{
+		displayName: 'Status',
+		name: 'status',
+		type: 'string',
+		required: false,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['ticket'],
 				operation: ['create'],
 			},
 		},
@@ -92,7 +157,7 @@ export const contactFields: INodeProperties[] = [
 		default: {},
 		displayOptions: {
 			show: {
-				resource: ['contact'],
+				resource: ['ticket'],
 				operation: ['create'],
 			},
 		},
@@ -104,7 +169,7 @@ export const contactFields: INodeProperties[] = [
 				default: '',
 				description: 'Name of the contact’s assistant',
 			},
-			makeCustomFieldsFixedCollection('contact'),
+			makeCustomFieldsFixedCollection('ticket'),
 			{
 				displayName: 'Date of Birth',
 				name: 'Date_of_Birth',
@@ -219,14 +284,79 @@ export const contactFields: INodeProperties[] = [
 	//           contact: upsert
 	// ----------------------------------------
 	{
-		displayName: 'Last Name',
-		name: 'lastName',
+		displayName: 'Subject',
+		name: 'subject',
 		type: 'string',
 		required: true,
 		default: '',
 		displayOptions: {
 			show: {
-				resource: ['contact'],
+				resource: ['ticket'],
+				operation: ['upsert'],
+			},
+		},
+	},
+	{
+		displayName: 'Department Id',
+		name: 'departmentId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['ticket'],
+				operation: ['upsert'],
+			},
+		},
+	},
+	{
+		displayName: 'Contact Id',
+		name: 'contactId',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['ticket'],
+				operation: ['upsert'],
+			},
+		},
+	},
+	{
+		displayName: 'Phone',
+		name: 'phone',
+		type: 'string',
+		required: false,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['ticket'],
+				operation: ['upsert'],
+			},
+		},
+	},
+	{
+		displayName: 'Description',
+		name: 'description',
+		type: 'string',
+		required: false,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['ticket'],
+				operation: ['upsert'],
+			},
+		},
+	},
+	{
+		displayName: 'Status',
+		name: 'status',
+		type: 'string',
+		required: false,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['ticket'],
 				operation: ['upsert'],
 			},
 		},
@@ -239,7 +369,7 @@ export const contactFields: INodeProperties[] = [
 		default: {},
 		displayOptions: {
 			show: {
-				resource: ['contact'],
+				resource: ['ticket'],
 				operation: ['upsert'],
 			},
 		},
@@ -251,7 +381,7 @@ export const contactFields: INodeProperties[] = [
 				default: '',
 				description: 'Name of the contact’s assistant',
 			},
-			makeCustomFieldsFixedCollection('contact'),
+			makeCustomFieldsFixedCollection('ticket'),
 			{
 				displayName: 'Date of Birth',
 				name: 'Date_of_Birth',
@@ -412,7 +542,7 @@ export const contactFields: INodeProperties[] = [
 		default: '',
 		displayOptions: {
 			show: {
-				resource: ['contact'],
+				resource: ['ticket'],
 				operation: ['search'],
 			},
 		},

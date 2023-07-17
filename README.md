@@ -8,6 +8,12 @@ functions, logic and apps. n8n's node-based approach makes it highly versatile, 
 anything to everything.
 
 ![n8n.io - Screenshot](https://raw.githubusercontent.com/n8n-io/n8n/master/assets/n8n-screenshot.png)
+## Build
+docker build -t n8n-mtm -f docker/images/n8n-custom/Dockerfile .
+docker tag n8n-mtm:latest <aws-accountid>.dkr.ecr.<aws-region>.amazonaws.com/n8n-mtm:<version>
+
+aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 700882629542.dkr.ecr.ap-south-1.amazonaws.com
+docker push 700882629542.dkr.ecr.ap-south-1.amazonaws.com/n8n-mtm:latest
 
 ## Demo
 
