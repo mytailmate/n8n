@@ -68,6 +68,7 @@ export async function zohoApiRequest(
 	}
 
 	try {
+		console.log("Request options are: " + JSON.stringify(options));
 		const responseData = await this.helpers.requestOAuth2?.call(this, 'zohoOAuth2Api', options);
 
 		if (responseData === undefined) return [];

@@ -565,7 +565,7 @@ export const ticketFields: INodeProperties[] = [
 		default: '',
 		displayOptions: {
 			show: {
-				resource: ['contact'],
+				resource: ['ticket'],
 				operation: ['update'],
 			},
 		},
@@ -578,7 +578,7 @@ export const ticketFields: INodeProperties[] = [
 		default: {},
 		displayOptions: {
 			show: {
-				resource: ['contact'],
+				resource: ['ticket'],
 				operation: ['update'],
 			},
 		},

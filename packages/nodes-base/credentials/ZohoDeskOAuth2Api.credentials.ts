@@ -68,7 +68,7 @@ export class ZohoDeskOAuth2Api implements ICredentialType {
 			displayName: 'Scope',
 			name: 'scope',
 			type: 'hidden',
-			default: 'Desk.contacts.READ,Desk.search.READ,Desk.tickets.ALL,Desk.tasks.ALL,Desk.settings.ALL,Desk.events.ALL',
+			default: 'Desk.contacts.READ,DESK.contacts.WRITE,DESK.contacts.UPDATE,Desk.search.READ,Desk.tickets.ALL,Desk.tasks.ALL,Desk.settings.ALL,Desk.events.ALL',
 		},
 		{
 			displayName: 'Auth URI Query Parameters',

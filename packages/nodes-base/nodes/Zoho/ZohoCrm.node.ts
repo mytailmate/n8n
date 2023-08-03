@@ -490,7 +490,8 @@ export class ZohoCrm implements INodeType {
 						const phone = this.getNodeParameter('phone', i);
 
 						const endpoint = `/contacts/search`;
-						responseData = await zohoApiRequest.call(this, 'GET', endpoint, {}, {phone: `${phone}`});
+						responseData = await zohoApiRequest.call(this, 'GET', endpoint, {}, {word: `${(phone)}`});
+						console.log("response for search contact is:" + JSON.stringify(responseData));
 						responseData = responseData.data;
 					} else if (operation === 'getAll') {
 						// ----------------------------------------

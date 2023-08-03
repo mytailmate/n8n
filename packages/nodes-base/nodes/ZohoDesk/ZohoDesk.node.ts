@@ -377,7 +377,7 @@ export class ZohoDesk implements INodeType {
 						const body: IDataObject = {
 							Account_Name: this.getNodeParameter('accountName', i),
 						};
-
+						
 						const additionalFields = this.getNodeParameter('additionalFields', i);
 
 						if (Object.keys(additionalFields).length) {
@@ -468,17 +468,18 @@ export class ZohoDesk implements INodeType {
 						// ----------------------------------------
 
 						const body: IDataObject = {
-							Last_Name: this.getNodeParameter('lastName', i),
+							lastName: this.getNodeParameter('lastName', i),
 						};
 
 						const additionalFields = this.getNodeParameter('additionalFields', i);
+						console.log("additional Fields are : "+ additionalFields);
 
 						if (Object.keys(additionalFields).length) {
 							Object.assign(body, adjustContactPayload(additionalFields));
 						}
-
-						responseData = await zohoApiRequest.call(this, 'POST', '/contacts', body);
-						responseData = responseData.data[0].details;
+						console.log("Request fir add contact is:" + JSON.stringify(body));
+						responseData = await zohoApiRequest.call(this, 'POST', '/contacts', body, {}, "https://desk.zoho.in");
+						// responseData = responseData.data[0].details;
 					} else if (operation === 'delete') {
 						// ----------------------------------------
 						//             contact: delete
@@ -507,8 +508,8 @@ export class ZohoDesk implements INodeType {
 						const phone = this.getNodeParameter('phone', i);
 
 						const endpoint = `/contacts/search`;
-						responseData = await zohoApiRequest.call(this, 'GET', endpoint, {}, {phone: `${phone}`}, "https://desk.zoho.in");
-						responseData = responseData.data;
+						responseData = await zohoApiRequest.call(this, 'GET', endpoint, {}, {_all: `${phone}`}, "https://desk.zoho.in");
+						console.log("Response is:" + JSON.stringify(responseData));
 					} else if (operation === 'getAll') {
 						// ----------------------------------------
 						//             contact: getAll
@@ -527,7 +528,7 @@ export class ZohoDesk implements INodeType {
 
 						const body: IDataObject = {};
 						const updateFields = this.getNodeParameter('updateFields', i);
-
+						console.log("updateFields is: " + JSON.stringify(updateFields));
 						if (Object.keys(updateFields).length) {
 							Object.assign(body, adjustContactPayload(updateFields));
 						} else {
@@ -537,8 +538,9 @@ export class ZohoDesk implements INodeType {
 						const contactId = this.getNodeParameter('contactId', i);
 
 						const endpoint = `/contacts/${contactId}`;
-						responseData = await zohoApiRequest.call(this, 'PUT', endpoint, body);
-						responseData = responseData.data[0].details;
+						console.log("Body is: " + JSON.stringify(body));
+						responseData = await zohoApiRequest.call(this, 'PUT', endpoint, body, {}, "https://desk.zoho.in");
+						// responseData = responseData.data[0].details;
 					} else if (operation === 'upsert') {
 						// ----------------------------------------
 						//             contact: upsert
@@ -567,7 +569,7 @@ export class ZohoDesk implements INodeType {
 
 					if (operation === 'create') {
 						// ----------------------------------------
-						//             contact: create
+						//             ticket: create
 						// ----------------------------------------
 
 						const body: IDataObject = {
@@ -575,16 +577,18 @@ export class ZohoDesk implements INodeType {
 							departmentId: this.getNodeParameter('departmentId', i),
 							contactId: this.getNodeParameter('contactId', i),
 							phone: this.getNodeParameter('phone', i),
+							status: this.getNodeParameter('status', i),
 						};
 
 						const additionalFields = this.getNodeParameter('additionalFields', i);
 
 						if (Object.keys(additionalFields).length) {
-							Object.assign(body, adjustContactPayload(additionalFields));
+							// Object.assign(body, adjustContactPayload(additionalFields));
 						}
 
 						responseData = await zohoApiRequest.call(this, 'POST', '/tickets', body, {}, "https://desk.zoho.in");
-						responseData = responseData.data[0].details;
+						// console.log("response is: " + JSON.stringify(body));
+						// responseData = responseData.data[0].details;
 					} else if (operation === 'delete') {
 						// ----------------------------------------
 						//             contact: delete
@@ -661,7 +665,7 @@ export class ZohoDesk implements INodeType {
 						}
 
 						responseData = await zohoApiRequest.call(this, 'POST', '/contacts/upsert', body);
-						responseData = responseData.data[0].details;
+						// responseData = responseData.data[0].details;
 					}
 				} else if (resource === 'deal') {
 					// **********************************************************************
