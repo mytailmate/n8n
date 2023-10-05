@@ -578,6 +578,7 @@ export class ZohoDesk implements INodeType {
 							contactId: this.getNodeParameter('contactId', i),
 							phone: this.getNodeParameter('phone', i),
 							status: this.getNodeParameter('status', i),
+							description: this.getNodeParameter('description', i),
 						};
 
 						const additionalFields = this.getNodeParameter('additionalFields', i);
